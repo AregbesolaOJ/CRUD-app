@@ -1,0 +1,33 @@
+.personsTable {
+    padding: 10px;
+}
+.table {
+    padding-bottom: 10px;
+    width: 80%;
+    margin: 10px auto;
+    border: 2px solid #c5c5c5;
+    box-shadow: 1px 3px 3px #ccc;
+}
+thead {
+    color: #222222;
+    font-size: 20px;
+    font-weight: bold;
+}
+thead tr th {
+    background-color: #f9a919;
+    height: 50px;
+}
+tbody {
+    color: #222222;
+    font-size: 18px;
+    text-transform: capitalize;
+}
+tfoot {
+    display: table-footer-group;
+    vertical-align: left;
+    border-color: inherit;
+}
+.action-icon {
+    cursor: pointer;
+    margin: 0 5px;
+}
