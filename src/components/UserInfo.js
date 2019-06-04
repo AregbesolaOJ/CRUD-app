@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux';
 
 class UserInfo extends Component {
     render () {
@@ -12,25 +11,15 @@ class UserInfo extends Component {
             backgroundColor: '#ffcc99',
             boxShadow: '1px 3px 3px #ccc'        
         }
+        const { name, age, country } = this.props.view;
         return (
             <div style={UserInfoStyle}>
-                <p>I'm {this.props.view.name}, about {this.props.view.age} years old,
-                <br /> and i'm from {this.props.view.country}</p>
+                <p>I'm {name}, about {age} years old,
+                <br /> and i'm from {country}</p>
                 <button onClick={this.props.personViewClose}>Close</button>
             </div>
         )    
     }
 }
-const mapStateToProps = state => {  
-    return {
-        view: state.personView,
-    };
-};
 
-const mapDispatchToProps = dispatch => {
-    return {
-        personViewClose: () => dispatch({type: "PERSON_VIEW_CLOSE"}),
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(UserInfo);
+export default UserInfo;

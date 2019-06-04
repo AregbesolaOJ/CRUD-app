@@ -1,24 +1,11 @@
 import React, { Component } from 'react'
 import './Persons.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { connect } from 'react-redux';
-import * as actionTypes from '../../actions/actions';
 
 class Persons extends Component {
 
-    deleteUser = id => {
-        const permission = window.confirm("Do you want to delete this item");
-
-        if(permission) {
-            this.props.deleteUser(id);
-            localStorage.setItem('users', JSON.stringify(this.props.myState));
-        } else {
-            return;
-        }
-    }
-
     render () {
-        const personList = this.props.myState.map((person, index) => (
+        const personList = this.props.persons.map((person, index) => (
                     <tr key={person.id}>
                         <td>
                             {index + 1}.
@@ -38,7 +25,7 @@ class Persons extends Component {
                         <td>
                             <FontAwesomeIcon className="action-icon" onClick={() => this.props.viewUser(person.id)} style={{color: 'lightblue'}} icon="info-circle" />
                             <FontAwesomeIcon className="action-icon" onClick={() => this.props.editUser(person.id)} style={{color: 'grey'}} icon="edit" />
-                            <FontAwesomeIcon className="action-icon" onClick={() => this.deleteUser(person.id)} style={{color: 'red'}} icon="trash-alt" />
+                            <FontAwesomeIcon className="action-icon" onClick={() => this.props.deleteUser(person.id)} style={{color: 'red'}} icon="trash-alt" />
                         </td>
                     </tr>
                   ));
@@ -65,18 +52,5 @@ class Persons extends Component {
     }
 }
 
-const mapStateToProps = state => {  
-  return {
-    myState: state.persons,
-  };
-};
 
-const mapDispatchToProps = dispatch => {
-  return {
-      viewUser: (userId) => dispatch({type: actionTypes.VIEW_USER, payload: userId}),
-      editUser: (userId) => dispatch({type: actionTypes.EDIT_USER, payload: userId}),
-      deleteUser: (userId) => dispatch({type: actionTypes.DELETE_USER, payload: userId})
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Persons);
+export default Persons;

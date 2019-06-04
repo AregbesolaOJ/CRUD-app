@@ -2,7 +2,7 @@ import * as actionTypes from '../actions/actions';
 
 const defaultState = {
     formIsValid: false,
-    persons: JSON.parse(localStorage.getItem('users')),
+    persons: [],
     personViewModal: false,
     isEditModal: false,
     editStateForm: {},

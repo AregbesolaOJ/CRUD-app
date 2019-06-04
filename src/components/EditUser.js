@@ -1,6 +1,5 @@
 import React from 'react';
 import Input from './Input/Input';
-import { connect } from 'react-redux';
 
 class EditUser extends React.Component {
     state = {
@@ -125,22 +124,19 @@ class EditUser extends React.Component {
         return isValid;
     }
 
-    updateUser = event => {
+    updatedUser = event => {
         event.preventDefault();
-        this.props.updateUser(this.state.myForm);
+        this.props.updatedUser(this.state.myForm);
         localStorage.setItem('users', JSON.stringify(this.props.persons));
-        // console.log(this.props.persons);    
     }
 
     componentDidMount() {
         const formCopy = {...this.state.myForm};
-
         for (let key in formCopy) {
             formCopy[key].value = this.props.editedUser[key];
         }
 
         this.setState({ myForm : formCopy })
-        // this.props.myState.persons = JSON.parse(localStorage.getItem('users')) || []
 
     }
 
@@ -155,7 +151,7 @@ class EditUser extends React.Component {
         }
 
         const editForm = (
-            <form onSubmit={this.updateUser}>
+            <form onSubmit={this.updatedUser}>
                 {formEditArray.map((formElement) => {
                 return (
                     <Input key={formElement.id}
@@ -180,19 +176,7 @@ class EditUser extends React.Component {
     }
 }
 
-const mapStateToProps = state => {
-    return {
-        persons: state.persons,
-        editedUser: state.editedUser
-    };
-};
 
-const mapDispatchToProps = dispatch => {
-    return {
-        updateUser: update => dispatch({ type: 'UPDATE_USER', payload: update }),
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(EditUser);
+export default EditUser;
 
 

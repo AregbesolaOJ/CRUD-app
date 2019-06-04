@@ -2,15 +2,13 @@ import React, { Component, Suspense } from 'react';
 import './App.css';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCheckSquare, faEdit, faInfoCircle, faTrashAlt, faCoffee } from '@fortawesome/free-solid-svg-icons'
-import * as actionTypes from '../actions/actions';
 
-import UserInfo from '../components/UserInfo';
 import EditUser from '../components/EditUser';
 import Input from '../components/Input/Input'
-import { connect } from 'react-redux';
 
 library.add(faCheckSquare, faEdit, faInfoCircle, faTrashAlt, faCoffee)
 const Persons = React.lazy(() => import('../components/Persons/Persons'));
+const UserInfo = React.lazy(() => import('../components/UserInfo'));
 
 class App extends Component {  
   state = {
@@ -97,7 +95,17 @@ class App extends Component {
         value: 'germany',
         touched: false
       }
-    }
+    },
+    persons: [],
+    personViewModal: false,
+    isEditModal: false,
+    editedUser: {},
+    addUserPanel: false
+
+  }
+
+  addUserPanel = () => {
+    this.setState({ addUserPanel: true })
   }
 
   handleChange = (event, inputID) => {
@@ -119,13 +127,29 @@ class App extends Component {
 
   addUserHandler = (event) => {
     event.preventDefault();
-    this.props.addUser(this.state.myForm);
+    const formData = {};
+
+    for (let formInputId in this.state.myForm) {
+      formData[formInputId] = this.state.myForm[formInputId].value;
+    }
+    const myId = Math.random().toString(36).substr(2);
+    formData.id = myId;
+
+    const newPersons = this.state.persons.concat(formData);
+
     const myForm = {...this.state.myForm};
     for (let formInputId in myForm) {
       myForm[formInputId].value = '';
     }
-    this.setState({ myForm: myForm, formIsValid: false })
-    localStorage.setItem('users', JSON.stringify(this.props.myState.persons))    
+
+    this.setState({ 
+      myForm: myForm, 
+      formIsValid: false,
+      persons: newPersons,
+      addUserPanel: false 
+    }, () => {
+      localStorage.setItem('users', JSON.stringify(this.state.persons))    
+    })
   }
 
   checkValidity = (value, rules) => {
@@ -146,8 +170,66 @@ class App extends Component {
       return isValid;
   }
 
-  componentDidMount() {
+  viewUser = id => {
+    const personView = this.state.persons.find(person => person.id === id);
+    this.setState({ 
+      personView: personView,                 
+      personViewModal: true
+    })
 
+  }
+
+  personViewClose = () => {
+    this.setState({ personViewModal: false })
+  }
+
+  editUser = id => {
+    const editedUser = this.state.persons.find(person => person.id === id);
+    this.setState({
+      editedUser: editedUser,
+      isEditModal: true
+    })
+    console.log(id, this.state.editedUser);
+
+  }
+
+  updatedUser = data => {
+      const updatedFormData = {};
+      for (let key in data) {
+        updatedFormData[key] = data[key].value;
+      }
+      updatedFormData.id = this.state.editedUser.id;
+      const updatedPersons = this.state.persons.map(person => {
+        if(person.id === this.state.editedUser.id) {
+          return person = updatedFormData;
+        }
+        return person;
+      });
+      this.setState({ persons: updatedPersons, isEditModal: false }, () => {
+        localStorage.setItem('users', JSON.stringify(this.state.persons));
+      })
+  }
+
+  deleteUser = id => {
+    const permission = window.confirm("Do you want to delete this item");
+
+    if(permission) {
+      const filteredPersons = this.state.persons.filter(person => person.id !== id);
+      this.setState({
+        persons: filteredPersons
+      }, () => {
+        localStorage.setItem('users', JSON.stringify(this.state.persons));
+      })
+    } else {
+        return;
+    }
+
+  }
+
+  componentDidMount() {
+    this.setState({
+      persons: JSON.parse(localStorage.getItem('users'))
+    })
   }
 
   render() {
@@ -185,40 +267,42 @@ class App extends Component {
       <div className="App">
           <h1>React CRUD app with REDUX</h1>
           <p>Please click on the button below to add users...</p>
-          <button onClick={this.props.addUserPanel}>Add a User</button>
+          <button onClick={this.addUserPanel}>Add a User</button>
 
-          {this.props.myState.addUserPanel ? 
+          {this.state.addUserPanel ? 
             <React.Fragment>
               {form}
             </React.Fragment> 
             : 
             null
           }
-          {this.props.myState.persons.length ? 
+          {this.state.persons.length ? 
             <Suspense fallback={<div>Loading...</div>}>
-                <Persons />
+                <Persons 
+                  persons={this.state.persons}
+                  viewUser={this.viewUser}
+                  editUser={this.editUser}
+                  deleteUser={this.deleteUser}
+                />
             </Suspense> 
             : 
             null
           }          
-          {this.props.myState.personViewModal ? <UserInfo /> : null}          
-          {this.props.myState.isEditModal ? <EditUser /> : null}
+          {this.state.personViewModal ? 
+            <Suspense fallback={<div>Loading...</div>}>
+                <UserInfo 
+                  view={this.state.personView} 
+                  personViewClose={this.personViewClose} 
+                /> 
+            </Suspense> 
+          : 
+          null
+          }          
+          {this.state.isEditModal ? <EditUser editedUser={this.state.editedUser} updatedUser={this.updatedUser}/> : null}
       </div>
     );
   }
 }
 
-const mapStateToProps = state => {  
-  return {
-    myState: state
-  };
-};
 
-const mapDispatchToProps = dispatch => {
-  return {
-      addUserPanel: () => dispatch({type: actionTypes.ADD_USER_PANEL}),
-      addUser: (user) => dispatch({type: actionTypes.ADD_NEW_USER, payload: user}),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;
