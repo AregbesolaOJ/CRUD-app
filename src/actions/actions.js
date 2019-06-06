@@ -11,3 +11,5 @@ export const UPDATE_USER = 'UPDATE_USER';
 export const DELETE_USER = 'DELETE_USER';
   
 export const ADD_USER_PANEL = 'ADD_USER_PANEL'
+
+export const DATA_LOADED = 'DATA_LOADED';

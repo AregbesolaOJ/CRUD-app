@@ -6,7 +6,8 @@ import * as actionTypes from '../actions/actions';
 
 import UserInfo from '../components/UserInfo';
 import EditUser from '../components/EditUser';
-import Input from '../components/Input/Input'
+import Input from '../components/Input/Input';
+import Post from '../components/Post';
 import { connect } from 'react-redux';
 
 library.add(faCheckSquare, faEdit, faInfoCircle, faTrashAlt, faCoffee)
@@ -146,10 +147,6 @@ class App extends Component {
       return isValid;
   }
 
-  componentDidMount() {
-
-  }
-
   render() {
     const formElementsArray = [];
     for (let key in this.state.myForm) {
@@ -203,6 +200,7 @@ class App extends Component {
           }          
           {this.props.myState.personViewModal ? <UserInfo /> : null}          
           {this.props.myState.isEditModal ? <EditUser /> : null}
+          <Post />
       </div>
     );
   }

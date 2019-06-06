@@ -2,16 +2,22 @@ import * as actionTypes from '../actions/actions';
 
 const defaultState = {
     formIsValid: false,
-    persons: JSON.parse(localStorage.getItem('users')),
+    persons: JSON.parse(localStorage.getItem('users')) || [],
     personViewModal: false,
     isEditModal: false,
     editStateForm: {},
-    addUserPanel: false
+    addUserPanel: false,
+    remoteArticles: []
 };
 
 const reducer = (state = defaultState, action) => {
     switch( action.type ) {
 
+        case actionTypes.ADD_USER_PANEL:
+            return {
+                ...state,
+                addUserPanel: true                 
+            }
         case actionTypes.ADD_NEW_USER:
             const formData = {};
 
@@ -69,12 +75,11 @@ const reducer = (state = defaultState, action) => {
                 ...state,
                 persons: filteredPersons
             }
-        case actionTypes.ADD_USER_PANEL:
+        case 'DATA_LOADED':
             return {
                 ...state,
-                addUserPanel: true,
+                remoteArticles: state.remoteArticles.concat(action.payload),
             }
-
         default:
             return state;
         }
