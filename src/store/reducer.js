@@ -1,60 +1,84 @@
+import * as actionTypes from '../actions/actions';
 
 const defaultState = {
-    result: 2,
+    formIsValid: false,
+    persons: [],
+    personViewModal: false,
+    isEditModal: false,
+    editStateForm: {},
+    addUserPanel: false
 };
 
 const reducer = (state = defaultState, action) => {
-    if(action.type === 'INCREMENT') {
-        return {
-            ...state,
-            counter: state.counter + 1
+    switch( action.type ) {
+
+        case actionTypes.ADD_NEW_USER:
+            const formData = {};
+
+            for (let formInputId in action.payload) {
+              formData[formInputId] = action.payload[formInputId].value;
+            }
+            const myId = Math.random().toString(36).substr(2);
+            formData.id = myId
+            return {
+                ...state,
+                myForm: action.payload,
+                persons: state.persons.concat(formData), 
+                formIsValid: false, 
+                addUserPanel: false                 
+            }
+        case actionTypes.VIEW_USER:
+            const personView = state.persons.find(person => person.id === action.payload);
+            return {
+                ...state,
+                personView: personView,
+                personViewModal: true
+            }
+        case actionTypes.PERSON_VIEW_CLOSE:
+            return {
+                ...state,
+                personViewModal: false
+            }
+        case actionTypes.EDIT_USER:
+            const editedUser = state.persons.find(person => person.id === action.payload);
+            return {
+                ...state,
+                editedUser: editedUser,
+                isEditModal: true
+            }
+        case actionTypes.UPDATE_USER:
+            const updatedFormData = {};
+            for (let key in action.payload) {
+              updatedFormData[key] = action.payload[key].value;
+            }
+            updatedFormData.id = state.editedUser.id;
+            const updatedPersons = state.persons.map(person => {
+              if(person.id === state.editedUser.id) {
+                return person = updatedFormData;
+              }
+              return person;
+            });
+            return {
+                ...state,
+                persons: updatedPersons,
+                isEditModal: false
+            }
+        case actionTypes.DELETE_USER:
+            const filteredPersons = state.persons.filter(person => person.id !== action.payload)
+            return {
+                ...state,
+                persons: filteredPersons
+            }
+        case actionTypes.ADD_USER_PANEL:
+            return {
+                ...state,
+                addUserPanel: true,
+            }
+
+        default:
+            return state;
         }
-    }
-    if(action.type === 'DECREMENT') {
-        return {
-            ...state,
-            counter: state.counter - 1
-        }
-    }
-    if(action.type === 'ADD') {
-        return {
-            ...state,
-            counter: state.counter + 15
-            
-        }
-    }
-    if(action.type === 'SUB') {
-        return {
-            ...state,
-            counter: state.counter - 10
-        }
-    }
-    if(action.type === 'ADD_NEW_POST') {
-        const newPost = {
-            Id: state.results.length + 1, 
-            Title: action.payload.title, 
-            Body: action.payload.content, 
-            Author: action.payload.author
-        }
-        return {
-            ...state,
-            results: state.results.concat( newPost )
-        }
-    }
-    if(action.type === 'ADD_NEW') {
-        return {
-            ...state,
-            counter: state.counter + action.payload
-        }
-    }
-    if(action.type === 'SELECTED_POST') {
-        const post = state.results.filter(result => result.Id === action.postId);
-        return {
-            ...state,
-            selectedPost: post
-        }
-    }
-    return state
-};
+    
+    };
 
 export default reducer;
